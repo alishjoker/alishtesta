@@ -39,7 +39,7 @@ def sendMessage(to, text, contentMetadata={}, contentType=0):
 
 def NOTIFIED_ADD_CONTACT(op):
     try:
-        sendMessage(op.param1, client.getContact(op.param1).displayName + "سلام ممنون که منو ادد کردی من ربات هستم")
+        sendMessage(op.param1, client.getContact(op.param1).displayName + "Thanks for add")
     except Exception as e:
         print e
         print ("\n\nNOTIFIED_ADD_CONTACT\n\n")
@@ -60,7 +60,7 @@ tracer.addOpInterrupt(17,NOTIFIED_ACCEPT_GROUP_INVITATION)
 
 def NOTIFIED_KICKOUT_FROM_GROUP(op):
     try:
-        sendMessage(op.param1, client.getContact(op.param3).displayName + " به جفت تخم های ادمین که رفتی والا\n(*´･ω･*)")
+        sendMessage(op.param1, client.getContact(op.param3).displayName + " پوف جقی بود رفت\n(*´･ω･*)")
     except Exception as e:
         print e
         print ("\n\nNOTIFIED_KICKOUT_FROM_GROUP\n\n")
@@ -70,7 +70,7 @@ tracer.addOpInterrupt(19,NOTIFIED_KICKOUT_FROM_GROUP)
 
 def NOTIFIED_LEAVE_GROUP(op):
     try:
-        sendMessage(op.param1, client.getContact(op.param2).displayName + " به جفت تخم های ادمین که رفتی والا \n(*´･ω･*)")
+        sendMessage(op.param1, client.getContact(op.param2).displayName + " پوف جقی بود رفت\n(*´･ω･*)")
     except Exception as e:
         print e
         print ("\n\nNOTIFIED_LEAVE_GROUP\n\n")
@@ -123,11 +123,11 @@ def SEND_MESSAGE(op):
     try:
         if msg.toType == 0:
             if msg.contentType == 0:
-                if msg.text == "ایدی":
+                if msg.text == "mid":
                     sendMessage(msg.to, msg.to)
-                if msg.text == "من":
+                if msg.text == "me":
                     sendMessage(msg.to, text=None, contentMetadata={'mid': msg.from_}, contentType=13)
-                if msg.text == "گیفت":
+                if msg.text == "gift":
                     sendMessage(msg.to, text="gift sent", contentMetadata=None, contentType=9)
                 else:
                     pass
@@ -141,7 +141,7 @@ def SEND_MESSAGE(op):
                     sendMessage(msg.to, msg.to)
                 if msg.text == "ginfo":
                     group = client.getGroup(msg.to)
-                    md = "[اسم گروه]\n" + group.name + "\n\n[ایدی]\n" + group.id + "\n\n[عکس]\nhttp://dl.profile.line-cdn.net/" + group.pictureStatus
+                    md = "[Group Name]\n" + group.name + "\n\n[gid]\n" + group.id + "\n\n[Group Picture]\nhttp://dl.profile.line-cdn.net/" + group.pictureStatus
                     if group.preventJoinByTicket is False: md += "\n\nInvitationURL: Permitted\n"
                     else: md += "\n\nInvitationURL: Refusing\n"
                     if group.invitee is None: md += "\nMembers: " + str(len(group.members)) + "人\n\nInviting: 0People"
@@ -153,29 +153,29 @@ def SEND_MESSAGE(op):
                     group.name = key
                     client.updateGroup(group)
                     sendMessage(msg.to,"Group Name"+key+"Canged to")
-                if msg.text == "لینک":
+                if msg.text == "url":
                     sendMessage(msg.to,"line://ti/g/" + client._client.reissueGroupTicket(msg.to))
-                if msg.text == "باز":
+                if msg.text == "open":
                     group = client.getGroup(msg.to)
                     if group.preventJoinByTicket == False:
-                        sendMessage(msg.to, "باز شد")
+                        sendMessage(msg.to, "already open")
                     else:
                         group.preventJoinByTicket = False
                         client.updateGroup(group)
                         sendMessage(msg.to, "URL Open")
-                if msg.text == "بستن":
+                if msg.text == "close":
                     group = client.getGroup(msg.to)
                     if group.preventJoinByTicket == True:
-                        sendMessage(msg.to, "حله ")
+                        sendMessage(msg.to, "already close")
                     else:
                         group.preventJoinByTicket = True
                         client.updateGroup(group)
                         sendMessage(msg.to, "URL close")
-                if "پاک:" in msg.text:
+                if "kick:" in msg.text:
                     key = msg.text[5:]
                     client.kickoutFromGroup(msg.to, [key])
                     contact = client.getContact(key)
-                    sendMessage(msg.to, ""+contact.displayName+"جقی بود پاکش کردم اینجا جا جقی ها نیست")
+                    sendMessage(msg.to, ""+contact.displayName+"sorry")
                 if "nk:" in msg.text:
                     key = msg.text[3:]
                     group = client.getGroup(msg.to)
@@ -183,42 +183,42 @@ def SEND_MESSAGE(op):
                     Mids = [contact.mid for contact in group.members]
                     if key in Names:
                         kazu = Names.index(key)
-                        sendMessage(msg.to, "بای")
+                        sendMessage(msg.to, "Bye")
                         client.kickoutFromGroup(msg.to, [""+Mids[kazu]+""])
                         contact = client.getContact(Mids[kazu])
-                        sendMessage(msg.to, ""+contact.displayName+" ببخشید")
+                        sendMessage(msg.to, ""+contact.displayName+" Sorry")
                     else:
                         sendMessage(msg.to, "wtf?")
-                if msg.text == "کنسل":
+                if msg.text == "cancel":
                     group = client.getGroup(msg.to)
                     if group.invitee is None:
-                        sendMessage(op.message.to, "کسی دعوت نیست که.")
+                        sendMessage(op.message.to, "No one is inviting.")
                     else:
                         gInviMids = [contact.mid for contact in group.invitee]
                         client.cancelGroupInvitation(msg.to, gInviMids)
                         sendMessage(msg.to, str(len(group.invitee)) + " Done")
-                if "دعوت:" in msg.text:
+                if "invite:" in msg.text:
                     key = msg.text[-33:]
                     client.findAndAddContactsByMid(key)
                     client.inviteIntoGroup(msg.to, [key])
                     contact = client.getContact(key)
-                    sendMessage(msg.to, ""+contact.displayName+" I دعوت دادم دست خودم درد نکنه باتشکر علیش جوکر")
-                if msg.text == "من":
+                    sendMessage(msg.to, ""+contact.displayName+" I invited you")
+                if msg.text == "me":
                     M = Message()
                     M.to = msg.to
                     M.contentType = 13
-                    M.contentMetadata = {'ایدی': msg.from_}
+                    M.contentMetadata = {'mid': msg.from_}
                     client.sendMessage(M)
                 if "show:" in msg.text:
                     key = msg.text[-33:]
-                    sendMessage(msg.to, text=None, contentMetadata={'ایدی': key}, contentType=13)
+                    sendMessage(msg.to, text=None, contentMetadata={'mid': key}, contentType=13)
                     contact = client.getContact(key)
                     sendMessage(msg.to, ""+contact.displayName+"'s contact")
-                if msg.text == "ساعت":
-                    sendMessage(msg.to, "Current time is" + datetime.datetime.today().strftime('%Yثانیه%mدقیقه %dساعت %H:%M:%S') + "is")
-                if msg.text == "گیفت":
+                if msg.text == "time":
+                    sendMessage(msg.to, "Current time is" + datetime.datetime.today().strftime('%Y年%m月%d日 %H:%M:%S') + "is")
+                if msg.text == "gift":
                     sendMessage(msg.to, text="gift sent", contentMetadata=None, contentType=9)
-                if msg.text == "زیر":
+                if msg.text == "set":
                     sendMessage(msg.to, "I have set a read point ♪\n「tes」I will show you who I have read ♪")
                     try:
                         del wait['readPoint'][msg.to]
@@ -257,3 +257,4 @@ tracer.addOpInterrupt(25,SEND_MESSAGE)
 
 while True:
     tracer.execute()
+ 
